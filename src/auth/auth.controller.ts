@@ -7,7 +7,11 @@ import { Roles } from './decorators/roles.decorator';
 import { RolesGuard } from './guard/roles.guard';
 import { Role } from '../common/enum/role.enum';
 import { Auth } from './decorators/auth.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -24,6 +28,10 @@ export class AuthController {
     return this.authService.register(regiterDto);
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized Bearer Auth',
+  })
   @Get('profile')
   @Auth(Role.CLIENT)
   profile(@Req() req) {
