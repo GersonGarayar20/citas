@@ -1,4 +1,5 @@
 import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { Role } from 'src/common/enum/role.enum';
 import { Service } from 'src/services/entities/service.entity';
 import {
   Column,
@@ -11,13 +12,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-
 export enum UserRoles {
   ADMIN = 'ADMIN',
   WORKER = 'WORKER',
   CLIENT = 'CLIENT',
 }
-
 
 @Entity()
 export class User {
@@ -30,13 +29,13 @@ export class User {
   @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, select: false })
   password: string;
 
-  @Column({ default: 'client' })
-  role: string;
+  @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
+  role: Role;
 
-  @Column({ type: 'enum', enum: UserRoles, default:UserRoles.CLIENT })
+  @Column({ type: 'enum', enum: UserRoles, default: UserRoles.CLIENT })
   status: UserRoles;
 
   @CreateDateColumn()
@@ -51,8 +50,7 @@ export class User {
   @OneToMany(() => Appointment, (appointment) => appointment.worker)
   workers: Appointment[];
 
-  @ManyToMany(() => Service, service => service.users)
+  @ManyToMany(() => Service, (service) => service.users)
   @JoinTable()
   services: Service[];
-
 }
