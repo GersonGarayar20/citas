@@ -1,26 +1,33 @@
-import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { User } from 'src/users/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Service {
-    @PrimaryGeneratedColumn()
-    id: number;
-    
-    @Column()
-    name: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({nullable:true})
-    description:string;
+  @Column()
+  name: string;
 
-    @Column({nullable:false})
-    duration:number;
+  @Column({ nullable: true })
+  description: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({ nullable: false })
+  duration: number;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @ManyToMany(() => User, user => user.services)
-    users: User[];
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToMany(() => User, (user) => user.services)
+  users: User[];
 }

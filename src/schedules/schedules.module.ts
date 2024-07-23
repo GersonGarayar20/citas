@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Schedule } from './entities/schedule.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Schedule])],
+  imports: [TypeOrmModule.forFeature([Schedule])],
   controllers: [SchedulesController],
   providers: [SchedulesService],
 })

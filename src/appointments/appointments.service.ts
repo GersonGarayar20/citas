@@ -7,8 +7,10 @@ import { Appointment } from './entities/appointment.entity';
 
 @Injectable()
 export class AppointmentsService {
-
-  constructor(@InjectRepository(Appointment) private readonly appointmentRepository:Repository<Appointment> ){}
+  constructor(
+    @InjectRepository(Appointment)
+    private readonly appointmentRepository: Repository<Appointment>,
+  ) {}
 
   create(createAppointmentDto: CreateAppointmentDto) {
     return this.appointmentRepository.save(createAppointmentDto);
@@ -19,11 +21,11 @@ export class AppointmentsService {
   }
 
   findOne(id: number) {
-    return  this.appointmentRepository.findOneBy({id});
+    return this.appointmentRepository.findOneBy({ id });
   }
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return  this.appointmentRepository.update(id,updateAppointmentDto);
+    return this.appointmentRepository.update(id, updateAppointmentDto);
   }
 
   remove(id: number) {
