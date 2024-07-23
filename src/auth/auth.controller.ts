@@ -1,10 +1,7 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { AuthGuard } from './guard/auth.guard';
-import { Roles } from './decorators/roles.decorator';
-import { RolesGuard } from './guard/roles.guard';
 import { Role } from '../common/enum/role.enum';
 import { Auth } from './decorators/auth.decorator';
 import {
@@ -12,6 +9,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { RequestWithUser } from 'src/common/intefaces/request-with-user.interface';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -34,7 +32,7 @@ export class AuthController {
   })
   @Get('profile')
   @Auth(Role.CLIENT)
-  profile(@Req() req) {
+  profile(@Req() req: RequestWithUser) {
     console.log(req.user);
     return 'profile';
   }
