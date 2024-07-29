@@ -1,19 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
+import { UsersService } from 'src/users/users.service';
+import { Role } from 'src/common/enum/role.enum';
+import { ServicesService } from 'src/services/services.service';
 
 @Injectable()
 export class AppointmentsService {
   constructor(
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
+    private readonly usersService: UsersService,
+    private readonly servicesService: ServicesService,
   ) {}
 
-  create(createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentRepository.save(createAppointmentDto);
+  async create(createAppointmentDto: CreateAppointmentDto) {
+    const { clientId, workerId, serviceId, ...rest } = createAppointmentDto;
+
+    const client = await this.usersService.findOne(clientId);
+    const worker = await this.usersService.findOne(workerId);
+    const service = await this.servicesService.findOne(serviceId);
+
+    if (!client || !worker || !service) {
+      throw new BadRequestException('cliente, usuario, o servicio no existe');
+    }
+
+    if (client.role !== Role.CLIENT) {
+      throw new BadRequestException('el cliente no es cliente');
+    }
+
+    if (worker.role !== Role.WORKER) {
+      throw new BadRequestException('el trabajador no es trabajador');
+    }
+
+    return this.appointmentRepository.save({
+      ...rest,
+      client,
+      worker,
+      service,
+    });
   }
 
   findAll() {

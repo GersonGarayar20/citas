@@ -1,9 +1,11 @@
+import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,14 +22,17 @@ export class Service {
   description: string;
 
   @Column({ nullable: false })
-  duration: number;
+  duration_second: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   @ManyToMany(() => User, (user) => user.services)
   users: User[];
+
+  @OneToMany(() => Appointment, (appointment) => appointment.service)
+  appointments: Appointment[];
 }

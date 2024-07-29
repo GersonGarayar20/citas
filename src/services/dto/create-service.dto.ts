@@ -13,5 +13,5 @@ export class CreateServiceDto {
 
   @ApiProperty()
   @IsInt()
-  duration: number;
+  duration_second: number;
 }

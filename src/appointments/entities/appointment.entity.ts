@@ -1,9 +1,11 @@
+import { Service } from 'src/services/entities/service.entity';
 import { User } from '../../users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -19,14 +21,14 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.clients)
+  @ManyToOne(() => User, (user) => user.clients, { eager: true })
   client: User;
 
-  @ManyToOne(() => User, (user) => user.workers)
+  @ManyToOne(() => User, (user) => user.workers, { eager: true })
   worker: User;
 
-  @Column({ nullable: false })
-  service_id: number;
+  @ManyToOne(() => Service, (service) => service.id, { eager: true })
+  service: Service;
 
   @Column()
   date: Date;

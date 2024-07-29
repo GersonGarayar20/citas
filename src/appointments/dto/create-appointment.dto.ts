@@ -1,6 +1,13 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsDate } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsDate,
+  IsOptional,
+} from 'class-validator';
 import { AppointmentStatus } from '../entities/appointment.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreateAppointmentDto {
   @ApiProperty()
@@ -17,13 +24,15 @@ export class CreateAppointmentDto {
 
   @ApiProperty()
   @IsDate()
+  @Transform(({ value }) => new Date(value))
   date: Date;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   reason?: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsEnum(AppointmentStatus)
-  status: AppointmentStatus;
+  status?: AppointmentStatus;
 }
