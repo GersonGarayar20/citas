@@ -1,9 +1,9 @@
 import {
   IsEnum,
-  IsNotEmpty,
   IsNumber,
   IsDate,
   IsOptional,
+  IsString,
 } from 'class-validator';
 import { AppointmentStatus } from '../entities/appointment.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -26,6 +26,13 @@ export class CreateAppointmentDto {
   @IsDate()
   @Transform(({ value }) => new Date(value))
   date: Date;
+
+  @ApiProperty({
+    description: 'Start time of the schedule in HH:MM:SS format.',
+    example: '09:00:00',
+  })
+  @IsString()
+  startTime: string;
 
   @ApiProperty()
   @IsOptional()

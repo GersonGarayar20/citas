@@ -1,5 +1,6 @@
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { Role } from 'src/common/enum/role.enum';
+import { Schedule } from 'src/schedules/entities/schedule.entity';
 import { Service } from 'src/services/entities/service.entity';
 import {
   Column,
@@ -30,16 +31,19 @@ export class User {
   role: Role;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @OneToMany(() => Appointment, (appointment) => appointment.client)
   clients: Appointment[];
 
   @OneToMany(() => Appointment, (appointment) => appointment.worker)
   workers: Appointment[];
+
+  @OneToMany(() => Schedule, (schedule) => schedule.worker)
+  shedules: Schedule[];
 
   @ManyToMany(() => Service, (service) => service.users)
   @JoinTable()

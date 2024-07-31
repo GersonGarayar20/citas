@@ -1,11 +1,10 @@
-import { Service } from 'src/services/entities/service.entity';
+import { Service } from '../../services/entities/service.entity';
 import { User } from '../../users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -32,6 +31,12 @@ export class Appointment {
 
   @Column()
   date: Date;
+
+  @Column({ type: 'time' })
+  startTime: string;
+
+  @Column({ type: 'time' })
+  endTime: string;
 
   @Column({ nullable: true })
   reason: string;

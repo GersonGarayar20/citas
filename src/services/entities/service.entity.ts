@@ -1,5 +1,5 @@
-import { Appointment } from 'src/appointments/entities/appointment.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Appointment } from '../../appointments/entities/appointment.entity';
+import { User } from '../../users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -22,13 +22,13 @@ export class Service {
   description: string;
 
   @Column({ nullable: false })
-  duration_second: number;
+  durationMin: number;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @ManyToMany(() => User, (user) => user.services)
   users: User[];

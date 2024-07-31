@@ -4,8 +4,8 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
-import { UsersService } from 'src/users/users.service';
-import { Role } from 'src/common/enum/role.enum';
+import { UsersService } from '../users/users.service';
+import { Role } from '../common/enum/role.enum';
 import { ServicesService } from 'src/services/services.service';
 
 @Injectable()
@@ -36,12 +36,15 @@ export class AppointmentsService {
       throw new BadRequestException('el trabajador no es trabajador');
     }
 
-    return this.appointmentRepository.save({
+    const appointment = this.appointmentRepository.create({
       ...rest,
+      endTime: '17:00',
       client,
       worker,
       service,
     });
+
+    return this.appointmentRepository.save(appointment);
   }
 
   findAll() {
