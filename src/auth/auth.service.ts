@@ -17,14 +17,16 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login({ email, password }: LoginDto) {
-    const user = await this.usersService.findUserByEmailWithPassword(email);
+  async login(loginDto: LoginDto) {
+    const user = await this.usersService.findUserByEmailWithPassword(
+      loginDto.email,
+    );
 
     if (!user) {
       throw new UnauthorizedException('Usuario o contraseña incorrectos.');
     }
 
-    const isPasswordValid = await compare(password, user.password);
+    const isPasswordValid = await compare(loginDto.password, user.password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Usuario o contraseña incorrectos.');
@@ -34,8 +36,10 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync(payload);
 
+    const { password, ...res } = user;
+
     return {
-      user,
+      user: { ...res },
       token,
     };
   }

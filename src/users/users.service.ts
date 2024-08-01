@@ -12,8 +12,10 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.usersRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const user = await this.usersRepository.save(createUserDto);
+    const { password, ...res } = user;
+    return { ...res };
   }
 
   findUserByEmailWithPassword(email: string) {
