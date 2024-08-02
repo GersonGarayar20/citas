@@ -7,6 +7,12 @@ import { Appointment } from './entities/appointment.entity';
 import { UsersService } from '../users/users.service';
 import { Role } from '../common/enum/role.enum';
 import { ServicesService } from 'src/services/services.service';
+import {
+  calculateEndTime,
+  isDateValidAndAvailable,
+  isTimeRangeWithinAvailableRange,
+} from 'src/common/utils/time';
+import { SchedulesService } from 'src/schedules/schedules.service';
 
 @Injectable()
 export class AppointmentsService {
@@ -15,30 +21,76 @@ export class AppointmentsService {
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly usersService: UsersService,
     private readonly servicesService: ServicesService,
+    private readonly schedulesService: SchedulesService,
   ) {}
 
   async create(createAppointmentDto: CreateAppointmentDto) {
-    const { clientId, workerId, serviceId, ...rest } = createAppointmentDto;
+    const { clientId, workerId, serviceId, startTime, date, ...rest } =
+      createAppointmentDto;
 
-    const client = await this.usersService.findOne(clientId);
-    const worker = await this.usersService.findOne(workerId);
-    const service = await this.servicesService.findOne(serviceId);
+    const client = await this.usersService.findClient(clientId);
+    const worker = await this.usersService.findWorker(workerId);
 
-    if (!client || !worker || !service) {
-      throw new BadRequestException('cliente, usuario, o servicio no existe');
+    const service = await this.servicesService.findWorkerService(
+      worker.id,
+      serviceId,
+    );
+
+    const schedule = await this.schedulesService.findOneByWorker(worker.id);
+
+    const endTime = calculateEndTime(startTime, service.durationMin);
+
+    // Verificar si el rango de tiempo está disponible en el horario del trabajador
+    const isAvailableTime = isTimeRangeWithinAvailableRange(
+      startTime,
+      endTime,
+      schedule.startTime,
+      schedule.endTime,
+    );
+
+    if (!isAvailableTime) {
+      throw new BadRequestException(
+        `La hora de la cita (${startTime} - ${endTime}) no está disponible dentro del horario laboral del trabajador (${schedule.startTime} - ${schedule.endTime}).`,
+      );
     }
 
-    if (client.role !== Role.CLIENT) {
-      throw new BadRequestException('el cliente no es cliente');
+    // Verificar si la fecha de la cita está disponible en el horario del trabajador
+    const isAvailableDate = isDateValidAndAvailable(date, schedule.days);
+
+    if (!isAvailableDate) {
+      const availableDays = schedule.days.join(', ');
+      throw new BadRequestException(
+        `La fecha seleccionada (${date.toDateString()}) no está disponible. El trabajador solo está disponible en los siguientes días: ${availableDays}.`,
+      );
     }
 
-    if (worker.role !== Role.WORKER) {
-      throw new BadRequestException('el trabajador no es trabajador');
+    // Verificar si la hora de la cita ya está tomada
+    const existingAppointments = await this.appointmentRepository.find({
+      where: { worker: { id: workerId }, date },
+    });
+
+    const isOverlapping = existingAppointments.some((appointment) => {
+      const resultado = isTimeRangeWithinAvailableRange(
+        startTime,
+        endTime,
+        appointment.startTime,
+        appointment.endTime,
+      );
+
+      return resultado;
+    });
+
+    if (isOverlapping) {
+      throw new BadRequestException(
+        `La hora de la cita seleccionada (${startTime} - ${endTime}) ya está ocupada por otra cita.`,
+      );
     }
 
     const appointment = this.appointmentRepository.create({
       ...rest,
-      endTime: '17:00',
+      date,
+      startTime,
+      endTime,
       client,
       worker,
       service,
